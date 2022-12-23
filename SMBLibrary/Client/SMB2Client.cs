@@ -60,6 +60,7 @@ namespace SMBLibrary.Client
 
         public SMB2Client()
         {
+            _log.Trace("Creating SMB2Client");
         }
 
         /// <param name="serverName">
@@ -350,12 +351,12 @@ namespace SMBLibrary.Client
             }
             catch (ObjectDisposedException)
             {
-                Log("[ReceiveCallback] EndReceive ObjectDisposedException");
+                _log.Error("[ReceiveCallback] EndReceive ObjectDisposedException");
                 return;
             }
             catch (SocketException ex)
             {
-                Log("[ReceiveCallback] EndReceive SocketException: " + ex.Message);
+                _log.Error("[ReceiveCallback] EndReceive SocketException: " + ex.Message);
                 return;
             }
 
@@ -376,12 +377,12 @@ namespace SMBLibrary.Client
                 catch (ObjectDisposedException)
                 {
                     m_isConnected = false;
-                    Log("[ReceiveCallback] BeginReceive ObjectDisposedException");
+                    _log.Error("[ReceiveCallback] BeginReceive ObjectDisposedException");
                 }
                 catch (SocketException ex)
                 {
                     m_isConnected = false;
-                    Log("[ReceiveCallback] BeginReceive SocketException: " + ex.Message);
+                    _log.Error("[ReceiveCallback] BeginReceive SocketException: " + ex.Message);
                 }
             }
         }
@@ -432,7 +433,7 @@ namespace SMBLibrary.Client
                 }
                 catch (Exception ex)
                 {
-                    Log("Invalid SMB2 response: " + ex.Message);
+                    _log.Error("Invalid SMB2 response: " + ex.Message);
                     state.ClientSocket.Close();
                     m_isConnected = false;
                     return;
@@ -479,7 +480,7 @@ namespace SMBLibrary.Client
             }
             else
             {
-                Log("Inappropriate NetBIOS session packet");
+                _log.Error("Inappropriate NetBIOS session packet");
                 state.ClientSocket.Close();
             }
         }
