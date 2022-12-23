@@ -60,7 +60,7 @@ namespace SMBLibrary.Client
 
         public SMB2Client()
         {
-            _log.Trace("Creating SMB2Client");
+            _log.Trace("Creating SMB2Client ver 2");
         }
 
         /// <param name="serverName">
@@ -651,15 +651,18 @@ namespace SMBLibrary.Client
             try
             {
                 byte[] packetBytes = packet.GetBytes();
-                socket.Send(packetBytes);
+                var sentCount = socket.Send(packetBytes);
+                if (packetBytes.Length != sentCount)
+                    throw new InvalidOperationException(
+                        $"Send count = {packetBytes.Length}, actual sent = {sentCount}");
             }
             catch (SocketException socketWException)
             {
-                _log.Error(socketWException);
+                _log.Error($"SocketException Code = {socketWException.ErrorCode}", socketWException);
             }
             catch (ObjectDisposedException disposedException)
             {
-                _log.Error(disposedException);
+                _log.Error($"ObjectDisposedException", disposedException);
             }
         }
     }
