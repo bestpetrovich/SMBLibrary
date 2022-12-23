@@ -13,6 +13,7 @@ using System.Threading;
 using SMBLibrary.NetBios;
 using SMBLibrary.SMB2;
 using Utilities;
+using NLog;
 
 namespace SMBLibrary.Client
 {
@@ -54,6 +55,8 @@ namespace SMBLibrary.Client
         private byte[] m_securityBlob;
         private byte[] m_sessionKey;
         private ushort m_availableCredits = 1;
+
+        private static readonly ILogger _log = LogManager.GetCurrentClassLogger();
 
         public SMB2Client()
         {
@@ -649,11 +652,13 @@ namespace SMBLibrary.Client
                 byte[] packetBytes = packet.GetBytes();
                 socket.Send(packetBytes);
             }
-            catch (SocketException)
+            catch (SocketException socketWException)
             {
+                _log.Error(socketWException);
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException disposedException)
             {
+                _log.Error(disposedException);
             }
         }
     }
