@@ -229,3 +229,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+/.vs/SMBServer.VS2019/DesignTimeBuild/.dtbcache.v2
+/.vs/SMBServer.VS2019/project-colors.json
+/.vs/SMBServer.VS2019/v17/.futdcache.v1
+/.vs/SMBServer.VS2019/v17/fileList.bin
