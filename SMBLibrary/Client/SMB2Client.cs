@@ -19,6 +19,7 @@ namespace SMBLibrary.Client
 {
     public class SMB2Client : ISMBClient
     {
+        private readonly int? _instanceId;
         public static readonly int NetBiosOverTCPPort = 139;
         public static readonly int DirectTCPPort = 445;
 
@@ -58,9 +59,10 @@ namespace SMBLibrary.Client
 
         private static readonly ILogger _log = LogManager.GetCurrentClassLogger();
 
-        public SMB2Client()
+        public SMB2Client(int? instanceId = null)
         {
-            _log.Trace("Creating SMB2Client ver 2");
+            _instanceId = instanceId;
+            _log.Trace($"Instance[{_instanceId}]: Creating SMB2Client ver 4");
         }
 
         /// <param name="serverName">
@@ -351,12 +353,12 @@ namespace SMBLibrary.Client
             }
             catch (ObjectDisposedException)
             {
-                _log.Error("[ReceiveCallback] EndReceive ObjectDisposedException");
+                _log.Error($"Instance[{_instanceId}]:[ReceiveCallback] EndReceive ObjectDisposedException");
                 return;
             }
             catch (SocketException ex)
             {
-                _log.Error("[ReceiveCallback] EndReceive SocketException: " + ex.Message);
+                _log.Error($"Instance[{_instanceId}]:[ReceiveCallback] EndReceive SocketException: " + ex.Message);
                 return;
             }
 
@@ -377,12 +379,12 @@ namespace SMBLibrary.Client
                 catch (ObjectDisposedException)
                 {
                     m_isConnected = false;
-                    _log.Error("[ReceiveCallback] BeginReceive ObjectDisposedException");
+                    _log.Error($"Instance[{_instanceId}]:[ReceiveCallback] BeginReceive ObjectDisposedException");
                 }
                 catch (SocketException ex)
                 {
                     m_isConnected = false;
-                    _log.Error("[ReceiveCallback] BeginReceive SocketException: " + ex.Message);
+                    _log.Error($"Instance[{_instanceId}]:[ReceiveCallback] BeginReceive SocketException: " + ex.Message);
                 }
             }
         }
@@ -412,6 +414,8 @@ namespace SMBLibrary.Client
 
         private void ProcessPacket(SessionPacket packet, ConnectionState state)
         {
+            _log.Trace($"Instance[{_instanceId}]:Got Packet Type={packet.Type} Len={packet.Length}");
+            
             if (packet is SessionMessagePacket)
             {
                 byte[] messageBytes;

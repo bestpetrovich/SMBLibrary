@@ -6,6 +6,7 @@
  */
 using System;
 using System.Collections.Generic;
+using NLog;
 using SMBLibrary.SMB2;
 using Utilities;
 
@@ -18,6 +19,7 @@ namespace SMBLibrary.Client
         private SMB2Client m_client;
         private uint m_treeID;
         private bool m_encryptShareData;
+        private static readonly ILogger _log = LogManager.GetCurrentClassLogger();
 
         public SMB2FileStore(SMB2Client client, uint treeID, bool encryptShareData)
         {
@@ -38,15 +40,18 @@ namespace SMBLibrary.Client
             request.CreateDisposition = createDisposition;
             request.CreateOptions = createOptions;
             request.ImpersonationLevel = ImpersonationLevel.Impersonation;
+            _log.Trace($"Before sending {nameof(CreateFile)} for '{path}'");
             TrySendCommand(request);
-
+            _log.Trace($"Before sending WaitForCommand for '{path}'");
             SMB2Command response = m_client.WaitForCommand(request.MessageID);
+            _log.Trace($"After sending WaitForCommand for '{path}' responce={response?.Header?.Status}");
             if (response != null)
             {
                 if (response.Header.Status == NTStatus.STATUS_SUCCESS && response is CreateResponse)
                 {
                     CreateResponse createResponse = ((CreateResponse)response);
                     handle = createResponse.FileId;
+                    _log.Trace($"CreateFile Success for '{path}' fileId.Persistent = {createResponse.FileId.Persistent}");
                     fileStatus = ToFileStatus(createResponse.CreateAction);
                 }
                 return response.Header.Status;
@@ -101,8 +106,11 @@ namespace SMBLibrary.Client
             request.Offset = (ulong)offset;
             request.Data = data;
 
+            _log.Trace($"Before TrySendCommand {nameof(WriteFile)} for fileId.Persistent = {request.FileId.Persistent}");
             TrySendCommand(request);
+            _log.Trace($"Before WaitForCommand {nameof(WriteFile)} for fileId.Persistent = {request.FileId.Persistent}");
             SMB2Command response = m_client.WaitForCommand(request.MessageID);
+            _log.Trace($"After WaitForCommand {nameof(WriteFile)} for fileId.Persistent = {request.FileId.Persistent} status = {response?.Header?.Status}");
             if (response != null)
             {
                 if (response.Header.Status == NTStatus.STATUS_SUCCESS && response is WriteResponse)
