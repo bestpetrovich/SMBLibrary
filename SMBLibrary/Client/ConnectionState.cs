@@ -16,16 +16,16 @@ namespace SMBLibrary.Client
 {
     public class ConnectionState
     {
-        private Socket m_clientSocket;
+        private TcpClient m_clientSocket;
         private NBTConnectionReceiveBuffer m_receiveBuffer;
 
-        public ConnectionState(Socket clientSocket)
+        public ConnectionState(TcpClient client)
         {
-            m_clientSocket = clientSocket;
+            m_clientSocket = client;
             m_receiveBuffer = new NBTConnectionReceiveBuffer();
         }
 
-        public Socket ClientSocket
+        public TcpClient Client
         {
             get
             {
