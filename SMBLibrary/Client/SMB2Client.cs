@@ -346,6 +346,7 @@ namespace SMBLibrary.Client
             try
             {
                 numberOfBytesReceived = clientSocket.EndReceive(ar);
+                _log.Error($"Instance[{_instanceId}]: EndReceive numberOfBytesReceived={numberOfBytesReceived}");
             }
             catch (ArgumentException) // The IAsyncResult object was not returned from the corresponding synchronous method on this class.
             {
@@ -374,7 +375,7 @@ namespace SMBLibrary.Client
 
                 try
                 {
-                    _log.Trace($"Call BeginReceive WriteOffset={buffer.WriteOffset}, AvailableLength={buffer.AvailableLength}");
+                    _log.Trace($"Instance[{_instanceId}]:Call BeginReceive WriteOffset={buffer.WriteOffset}, AvailableLength={buffer.AvailableLength}");
                     clientSocket.BeginReceive(buffer.Buffer, buffer.WriteOffset, buffer.AvailableLength, SocketFlags.None, OnClientSocketReceive, state);
                 }
                 catch (ObjectDisposedException)
@@ -400,8 +401,9 @@ namespace SMBLibrary.Client
                 {
                     packet = receiveBuffer.DequeuePacket();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    _log.Error(e, "ProcessConnectionBuffer");
                     state.ClientSocket.Close();
                     break;
                 }
