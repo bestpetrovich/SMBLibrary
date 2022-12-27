@@ -164,7 +164,7 @@ namespace SMBLibrary.Client
 
             ConnectionState state = new ConnectionState(m_clientSocket);
             NBTConnectionReceiveBuffer buffer = state.ReceiveBuffer;
-            m_clientSocket.BeginReceive(buffer.Buffer, buffer.WriteOffset, buffer.AvailableLength, SocketFlags.None, new AsyncCallback(OnClientSocketReceive), state);
+            m_clientSocket.BeginReceive(buffer.Buffer, buffer.WriteOffset, buffer.AvailableLength, SocketFlags.None, OnClientSocketReceive, state);
             return true;
         }
 
@@ -374,7 +374,8 @@ namespace SMBLibrary.Client
 
                 try
                 {
-                    clientSocket.BeginReceive(buffer.Buffer, buffer.WriteOffset, buffer.AvailableLength, SocketFlags.None, new AsyncCallback(OnClientSocketReceive), state);
+                    _log.Trace($"Call BeginReceive WriteOffset={buffer.WriteOffset}, AvailableLength={buffer.AvailableLength}");
+                    clientSocket.BeginReceive(buffer.Buffer, buffer.WriteOffset, buffer.AvailableLength, SocketFlags.None, OnClientSocketReceive, state);
                 }
                 catch (ObjectDisposedException)
                 {
